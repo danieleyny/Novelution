@@ -378,11 +378,11 @@ function RecordOrbital({ inView, reduced }: { inView: boolean; reduced: boolean 
     return () => clearInterval(id)
   }, [reduced, inView])
 
-  const CARD_HALF_W = 27
-  const CARD_HALF_H = 10
+  const CARD_HALF_W = 24
+  const CARD_HALF_H = 11
   const CARD_GAP = 2
-  const LINE_LEN = 14
-  const CHIP_GAP = 4
+  const LINE_LEN = 11
+  const CHIP_GAP = 9
 
   const satGeom = liveRecordSatellites.map((_, i) => {
     const angle = (i / liveRecordSatellites.length) * Math.PI * 2 - Math.PI / 2
@@ -445,6 +445,7 @@ function RecordOrbital({ inView, reduced }: { inView: boolean; reduced: boolean 
             style={{ left: `${x}%`, top: `${y}%` }}
             animate={{ scale: pulseTick > 0 ? [1, 1.04, 1] : 1 }}
             transition={{ duration: 0.6, delay: i * 0.05 }}
+            transformTemplate={({ scale }) => `translate(-50%, -50%) scale(${scale ?? 1})`}
           >
             <span className="wfc__sat-dot" />
             <strong>{sat}</strong>
