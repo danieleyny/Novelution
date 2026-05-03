@@ -345,8 +345,31 @@ function RoutingPanel({ inView }: { inView: boolean }) {
 
 /* ---------- Live Record ---------- */
 
+const SAT_STATUSES: Record<string, string> = {
+  Personnel: 'Connected',
+  Disclosures: 'Synced',
+  Commitments: 'Live',
+  Reports: 'Connected',
+  Integrations: 'Synced',
+  'Audit Trail': 'Recording',
+}
+
 function RecordPanel({ inView }: { inView: boolean }) {
   const reduced = useReducedMotion()
+  const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024)
+
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  const isMobile = vw < 768
+  if (isMobile) return <RecordMobile inView={inView} reduced={reduced} />
+  return <RecordOrbital inView={inView} reduced={reduced} />
+}
+
+function RecordOrbital({ inView, reduced }: { inView: boolean; reduced: boolean }) {
   const [pulseTick, setPulseTick] = useState(0)
 
   useEffect(() => {
@@ -354,16 +377,6 @@ function RecordPanel({ inView }: { inView: boolean }) {
     const id = setInterval(() => setPulseTick((t) => t + 1), 5000)
     return () => clearInterval(id)
   }, [reduced, inView])
-
-  const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024)
-  useEffect(() => {
-    const onResize = () => setVw(window.innerWidth)
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [])
-  const isMobile = vw < 768
-  const visibleSatellites = isMobile ? liveRecordSatellites.slice(0, 4) : liveRecordSatellites
-  const orbitR = isMobile ? 30 : 38
 
   return (
     <div className="wfc__record">
@@ -374,8 +387,8 @@ function RecordPanel({ inView }: { inView: boolean }) {
             <stop offset="100%" stopColor="#7c3aed" />
           </linearGradient>
         </defs>
-        {visibleSatellites.map((_, i) => {
-          const angle = (i / visibleSatellites.length) * Math.PI * 2 - Math.PI / 2
+        {liveRecordSatellites.map((_, i) => {
+          const angle = (i / liveRecordSatellites.length) * Math.PI * 2 - Math.PI / 2
           const r = 150
           const x = 300 + Math.cos(angle) * r
           const y = 200 + Math.sin(angle) * r
@@ -405,10 +418,10 @@ function RecordPanel({ inView }: { inView: boolean }) {
         <span>Updated · {pulseTick % 60}s ago</span>
       </div>
 
-      {visibleSatellites.map((sat, i) => {
-        const angle = (i / visibleSatellites.length) * Math.PI * 2 - Math.PI / 2
-        const x = 50 + Math.cos(angle) * orbitR
-        const y = 50 + Math.sin(angle) * orbitR
+      {liveRecordSatellites.map((sat, i) => {
+        const angle = (i / liveRecordSatellites.length) * Math.PI * 2 - Math.PI / 2
+        const x = 50 + Math.cos(angle) * 38
+        const y = 50 + Math.sin(angle) * 38
         return (
           <motion.div
             key={sat}
@@ -422,6 +435,81 @@ function RecordPanel({ inView }: { inView: boolean }) {
           </motion.div>
         )
       })}
+    </div>
+  )
+}
+
+function RecordMobile({ inView, reduced }: { inView: boolean; reduced: boolean }) {
+  const [activeIdx, setActiveIdx] = useState(0)
+  const [tick, setTick] = useState(0)
+
+  useEffect(() => {
+    if (reduced || !inView) return
+    const id = setInterval(() => {
+      setActiveIdx((i) => (i + 1) % liveRecordSatellites.length)
+      setTick((t) => t + 1)
+    }, 1500)
+    return () => clearInterval(id)
+  }, [reduced, inView])
+
+  return (
+    <div className="wfc__rec-m">
+      {/* Center: Institutional Record card */}
+      <div className="wfc__rec-m-card">
+        <div className="wfc__rec-m-card-head">
+          <span className="wfc__mono">Award · Protocol</span>
+          <span className="wfc__rec-m-live">
+            <span className="wfc__rec-m-live-dot" /> Live
+          </span>
+        </div>
+        <strong className="wfc__rec-m-id">RX-2407-118</strong>
+        <span className="wfc__rec-m-name">Institutional Record</span>
+        <span className="wfc__rec-m-meta">
+          <span className="wfc__rec-m-meta-dot" />
+          Updated · {tick % 60}s ago
+        </span>
+      </div>
+
+      {/* Connection rail with flowing data particles */}
+      <div className="wfc__rec-m-rail" aria-hidden="true">
+        <span className="wfc__rec-m-rail-line" />
+        <span className="wfc__rec-m-rail-flow wfc__rec-m-rail-flow--a" />
+        <span className="wfc__rec-m-rail-flow wfc__rec-m-rail-flow--b" />
+        <span className="wfc__rec-m-rail-flow wfc__rec-m-rail-flow--c" />
+        <span className="wfc__rec-m-rail-fan" />
+      </div>
+
+      {/* Connected satellites */}
+      <ul className="wfc__rec-m-list" role="list">
+        {liveRecordSatellites.map((sat, i) => {
+          const isActive = activeIdx === i
+          return (
+            <li
+              key={sat}
+              className={clsx('wfc__rec-m-row', isActive && 'is-active')}
+            >
+              <span className="wfc__rec-m-row-dot" aria-hidden="true" />
+              <strong>{sat}</strong>
+              <AnimatePresence mode="wait">
+                {isActive ? (
+                  <motion.span
+                    key="active"
+                    className="wfc__rec-m-status wfc__rec-m-status--active"
+                    initial={{ opacity: 0, x: 6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -6 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    {SAT_STATUSES[sat] || 'Synced'}
+                  </motion.span>
+                ) : (
+                  <span className="wfc__rec-m-status">Connected</span>
+                )}
+              </AnimatePresence>
+            </li>
+          )
+        })}
+      </ul>
     </div>
   )
 }

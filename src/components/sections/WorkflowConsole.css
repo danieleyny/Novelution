@@ -436,6 +436,263 @@
   .wfc__record-sat { font-size: 11px; padding: 5px 9px; }
 }
 
+/* ============================================================================
+   Live Record — Mobile vertical data-flow view
+   ========================================================================= */
+
+.wfc__rec-m {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 20px 16px 16px;
+  border-radius: var(--radius-4);
+  background: linear-gradient(180deg, rgba(11,18,48,0.55), rgba(7,13,28,0.85));
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.wfc__rec-m::before {
+  /* Soft cyan glow behind the central card */
+  content: '';
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(76, 201, 240, 0.22) 0%, transparent 60%);
+  filter: blur(20px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ----- Center "Institutional Record" card ----- */
+.wfc__rec-m-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 18px 16px;
+  border-radius: var(--radius-3);
+  background: var(--bg-elevated);
+  border: 1px solid rgba(76, 201, 240, 0.42);
+  box-shadow: 0 14px 36px rgba(5, 11, 26, 0.55), var(--glow-cyan-sm);
+}
+
+.wfc__rec-m-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wfc__rec-m-card-head .wfc__mono {
+  display: inline;
+  margin-bottom: 0;
+}
+
+.wfc__rec-m-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-mint);
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(89, 208, 180, 0.4);
+  background: rgba(89, 208, 180, 0.08);
+}
+
+.wfc__rec-m-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-mint);
+  box-shadow: 0 0 8px rgba(89, 208, 180, 0.7);
+  animation: statusPulse 2.4s ease-in-out infinite;
+}
+
+.wfc__rec-m-id {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: #fff;
+  margin-top: 4px;
+}
+
+.wfc__rec-m-name {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.wfc__rec-m-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.wfc__rec-m-meta-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 6px rgba(76, 201, 240, 0.7);
+}
+
+/* ----- Animated rail between card and list ----- */
+.wfc__rec-m-rail {
+  position: relative;
+  height: 60px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 280px;
+  z-index: 0;
+}
+
+.wfc__rec-m-rail-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  background: linear-gradient(180deg, rgba(76, 201, 240, 0.85), rgba(124, 58, 237, 0.4));
+  border-radius: 2px;
+}
+
+.wfc__rec-m-rail-fan {
+  /* Subtle "branching" feel where rail meets the list */
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 18px;
+  background:
+    radial-gradient(ellipse at center bottom, rgba(76, 201, 240, 0.32), transparent 70%);
+  pointer-events: none;
+}
+
+.wfc__rec-m-rail-flow {
+  position: absolute;
+  left: 50%;
+  width: 8px;
+  height: 14px;
+  border-radius: 4px;
+  transform: translateX(-50%);
+  background: var(--gradient-primary);
+  box-shadow: 0 0 14px rgba(76, 201, 240, 0.85);
+  opacity: 0;
+  animation: railFlow 2.2s linear infinite;
+}
+
+.wfc__rec-m-rail-flow--a { animation-delay: 0s; }
+.wfc__rec-m-rail-flow--b { animation-delay: 0.7s; }
+.wfc__rec-m-rail-flow--c { animation-delay: 1.4s; }
+
+@keyframes railFlow {
+  0%   { top: -10%; opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* ----- Satellite list ----- */
+.wfc__rec-m-list {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+}
+
+.wfc__rec-m-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-3);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  transition:
+    background var(--duration-default) var(--ease-default),
+    border-color var(--duration-default) var(--ease-default),
+    box-shadow var(--duration-default) var(--ease-default);
+}
+
+.wfc__rec-m-row.is-active {
+  background: linear-gradient(135deg, rgba(76, 201, 240, 0.10), rgba(124, 58, 237, 0.10));
+  border-color: rgba(76, 201, 240, 0.45);
+  box-shadow: var(--glow-cyan-sm);
+}
+
+.wfc__rec-m-row-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(76, 201, 240, 0.55);
+  box-shadow: 0 0 6px rgba(76, 201, 240, 0.45);
+  flex-shrink: 0;
+  transition: all var(--duration-default) var(--ease-default);
+}
+
+.wfc__rec-m-row.is-active .wfc__rec-m-row-dot {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 0 4px rgba(76, 201, 240, 0.18), 0 0 14px rgba(76, 201, 240, 0.85);
+  animation: nodePulse 1.5s ease-in-out infinite;
+}
+
+.wfc__rec-m-row strong {
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  min-width: 0;
+}
+
+.wfc__rec-m-row.is-active strong { color: var(--text-primary); }
+
+.wfc__rec-m-status {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.wfc__rec-m-status--active {
+  color: var(--accent-mint);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(89, 208, 180, 0.10);
+  border: 1px solid rgba(89, 208, 180, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wfc__rec-m-rail-flow,
+  .wfc__rec-m-live-dot,
+  .wfc__rec-m-row.is-active .wfc__rec-m-row-dot {
+    animation: none !important;
+  }
+}
+
 .wfc__record-sat strong {
   font-family: var(--font-sans);
   font-weight: 500;
