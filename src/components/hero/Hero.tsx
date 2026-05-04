@@ -76,8 +76,12 @@ export function Hero({ navigate }: HeroProps) {
           >
             <span className="hero__trust-label">{heroCopy.trustLine}</span>
             <ul>
-              {trustLogos.map((logo) => (
-                <li key={logo.short} title={logo.name}>
+              {trustLogos.map((logo, i) => (
+                <li
+                  key={logo.short}
+                  title={logo.name}
+                  className={i === trustLogos.length - 1 ? 'hero__trust-item--mobile-hide' : undefined}
+                >
                   {logo.logo ? (
                     <img
                       src={`${import.meta.env.BASE_URL}${logo.logo}`}

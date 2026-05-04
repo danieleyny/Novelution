@@ -106,16 +106,25 @@
 
 @media (max-width: 600px) {
   .hero__trust ul {
-    padding: 10px 4px;
-    gap: 6px 0;
+    padding: 12px 6px;
+    flex-wrap: nowrap;
+    width: 100%;
+    justify-content: space-around;
   }
   .hero__trust li {
-    padding: 0 14px;
-    height: 30px;
+    padding: 0 10px;
+    height: 32px;
+    flex: 1 1 0;
+  }
+  .hero__trust li.hero__trust-item--mobile-hide {
+    display: none;
+  }
+  .hero__trust li + li {
+    border-left-color: rgba(5, 11, 26, 0.08);
   }
   .hero__trust-logo {
     height: 26px;
-    max-width: 100px;
+    max-width: 100%;
   }
 }
 
